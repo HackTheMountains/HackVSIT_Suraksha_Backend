@@ -17,10 +17,7 @@ wss.on('connection', function connection(ws) {
         //         client.send(JSON.stringify( data));
         //     }
         // });
-        const parsedData = JSON.parse(data.toString())
-        console.log(parsedData)
-        const image = parsedData.image
-        const text = parsedData.text
+        console.log(data)
     });
 
     ws.send('Hello! Message From Server!!');
