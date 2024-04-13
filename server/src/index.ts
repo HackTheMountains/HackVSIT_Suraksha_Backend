@@ -18,6 +18,7 @@ wss.on('connection', function connection(ws) {
         //     }
         // });
         const parsedData = JSON.parse(data.toString())
+        console.log(parsedData)
         const image = parsedData.image
         const text = parsedData.text
     });
