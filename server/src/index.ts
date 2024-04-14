@@ -23,9 +23,13 @@ wss.on('connection', function connection(ws) {
         //     }
         // });
         const { user, image} = JSON.parse(data.toString())
+        if(user === null || image === null){
         await Redis.lPush("posts", JSON.stringify({user,image}))
         console.log({"username": user})
         console.log({"imageURL":image})
+        } else {
+            console.log("Either the image received or user received is NULL")
+        }
     });
 
     ws.send('Hello! Message From Server!!');

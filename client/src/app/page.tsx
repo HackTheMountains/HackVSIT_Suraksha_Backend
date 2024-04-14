@@ -53,6 +53,7 @@ export default function Home() {
     }, [])
 
     useEffect(()=>{
+        console.log("Sending Data")
         sendMessage({"user":name, "image": imageURL})
     },[imageURL])
 
