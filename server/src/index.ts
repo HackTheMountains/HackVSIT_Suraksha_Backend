@@ -23,7 +23,7 @@ wss.on('connection', function connection(ws) {
         //     }
         // });
         const { user, image} = JSON.parse(data.toString())
-        if(user === null || image === null){
+        if(user!==undefined && image!==undefined){
         await Redis.lPush("posts", JSON.stringify({user,image}))
         console.log({"username": user})
         console.log({"imageURL":image})
