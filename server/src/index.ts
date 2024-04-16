@@ -15,7 +15,7 @@ Redis.on('error', err => console.log('Redis Client Error', err));
 
 
 const app = express()
-const httpServer = app.listen(8080)
+const httpServer = app.listen(3000)
 
 const wss = new WebSocketServer({ server: httpServer });
 
