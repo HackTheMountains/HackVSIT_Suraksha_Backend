@@ -22,9 +22,11 @@ async function startWorkwer() {
         try{
             const submission = await Redis.brPop("posts", 0);
             console.log("This is the worker")
-            const { user, image} = JSON.parse(submission!.element)
+            const { user, image, latitude, longitude} = JSON.parse(submission!.element)
             console.log(user)
             console.log(image)
+            console.log(latitude)
+            console.log(longitude)
         } catch (error) {
             console.error("Error processing submission: ",error);
         }

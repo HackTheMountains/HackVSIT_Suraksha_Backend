@@ -28,11 +28,13 @@ wss.on('connection', function connection(ws) {
         //         client.send(JSON.stringify( data));
         //     }
         // });
-        const { user, image} = JSON.parse(data.toString())
+        const { user, image, latitude, longitude} = JSON.parse(data.toString())
         if(user!==undefined && image!==undefined){
         await Redis.lPush("posts", JSON.stringify({user,image}))
         console.log({"username": user})
         console.log({"imageURL":image})
+        console.log({"latitude_server": latitude})
+        console.log({"longitude_server": longitude})
         } else {
             console.log("Either the image received or user received is NULL")
         }
