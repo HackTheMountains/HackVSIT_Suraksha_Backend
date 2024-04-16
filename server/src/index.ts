@@ -30,7 +30,7 @@ wss.on('connection', function connection(ws) {
         // });
         const { user, image, latitude, longitude} = JSON.parse(data.toString())
         if(user!==undefined && image!==undefined){
-        await Redis.lPush("posts", JSON.stringify({user,image,latitude, longitude}))
+        await Redis.lPush("posts", JSON.stringify({user,image,latitude,longitude}))
         console.log({"username": user})
         console.log({"imageURL":image})
         console.log({"latitude_server": latitude})
