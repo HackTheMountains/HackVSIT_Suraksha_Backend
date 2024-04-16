@@ -11,19 +11,21 @@ datasource db {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  email    String @unique
-  name     String
-  username String
-  posts    Post[]
+  id        Int    @id @default(autoincrement())
+  email     String @unique
+  name      String
+  firstname String
+  lastname  String
+  MobileNo  String
+  posts     Post[]
 }
 
 model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
+  id        Int    @id @default(autoincrement())
+  content   String
   longitude String
   latitude  String
-  User      User?   @relation(fields: [userId], references: [id])
+  image     String
+  User      User?  @relation(fields: [userId], references: [id])
   userId    Int?
 }
