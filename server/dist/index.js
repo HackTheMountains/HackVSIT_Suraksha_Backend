@@ -15,7 +15,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const ws_1 = require("ws");
 const redis_1 = require("redis");
-const Redis = (0, redis_1.createClient)({});
+const Redis = (0, redis_1.createClient)({
+    password: '93yDM29DC2XjVXPigsSerWvXaY6yFbYk',
+    socket: {
+        host: 'redis-15621.c305.ap-south-1-1.ec2.cloud.redislabs.com',
+        port: 15621
+    }
+});
 startServer();
 Redis.on('error', err => console.log('Redis Client Error', err));
 const app = (0, express_1.default)();

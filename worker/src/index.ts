@@ -1,7 +1,13 @@
 import express from 'express'
 import { createClient } from "redis";
 
-const Redis = createClient({});
+const Redis = createClient({
+    password: '93yDM29DC2XjVXPigsSerWvXaY6yFbYk',
+    socket: {
+        host: 'redis-15621.c305.ap-south-1-1.ec2.cloud.redislabs.com',
+        port: 15621
+    }
+});
 Redis.on('error', err => console.log('Redis Client Error', err));
 
 
