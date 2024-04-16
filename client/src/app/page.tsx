@@ -40,7 +40,7 @@ export default function Home() {
     };
 
     useEffect(() => {
-        const newSocket = new WebSocket('ws://localhost:8080');
+        const newSocket = new WebSocket('ws://hacksvsit.onrender.com');
         newSocket.onopen = () => {
             console.log('Connection established')
             newSocket.send(JSON.stringify({"message": "Hello Server"}));
