@@ -12,7 +12,7 @@ Redis.on('error', err => console.log('Redis Client Error', err));
 
 
 const app = express()
-const httpServer = app.listen(4000)
+const httpServer = app.listen(3000)
 
 async function startWorkwer() {
     try{
