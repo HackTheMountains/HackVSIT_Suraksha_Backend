@@ -45,7 +45,7 @@ async function startWorkwer() {
 startWorkwer();
 
 app.post('/signIn', async (req, res) => {
-    const { email, firstname, lastname, MobileNo, password } = req.body; // Extract password from request body
+    const { email, firstname, lastname, MobileNo, password } = req.body;
     if (!password) {
         return res.status(400).json({ error: 'Password is required' });
     }
@@ -74,5 +74,115 @@ app.post('/signIn', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+app.post('/signUp', async (req, res) => {
+    const { email } = req.body;
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                email: email
+            }
+        });
+        if (user) {
+            return res.json({ user });
+        } else {
+            return res.json({ message: 'User does not exist' });
+        }
+    } catch (error) {
+        console.error('Error checking user:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
+app.post('/createPost', async (req, res) => {
+    const { email, content, longitude, latitude, image } = req.body;
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                email: email
+            }
+        });
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        const post = await prisma.post.create({
+            data: {
+                content,
+                longitude,
+                latitude,
+                image,
+                userId: user.id
+            }
+        });
+        return res.json({ post });
+    } catch (error) {
+        console.error('Error creating post:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/userPosts', async (req, res) => {
+    const { email } = req.body;
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                email: email.toString()
+            }
+        });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        const userPosts = await prisma.post.findMany({
+            where: {
+                userId: user.id
+            }
+        });
+        return res.json({ userPosts });
+    } catch (error) {
+        console.error('Error getting user posts:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.delete('/deletePost', async (req, res) => {
+    const { postId } = req.body;
+    if (!postId) {
+        return res.status(400).json({ error: 'Post ID is required in the request body' });
+    }
+    try {
+        const post = await prisma.post.findUnique({
+            where: {
+                id: parseInt(postId)
+            }
+        });
+        if (!post) {
+            return res.status(404).json({ error: 'Post not found' });
+        }
+        await prisma.post.delete({
+            where: {
+                id: parseInt(postId)
+            }
+        });
+        return res.json({ message: 'Post deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting post:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/posts', async (req, res) => {
+    try {
+        const posts = await prisma.post.findMany();
+
+        return res.json({ posts });
+    } catch (error) {
+        console.error('Error fetching posts:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
 
 
