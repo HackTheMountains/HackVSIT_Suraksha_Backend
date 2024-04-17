@@ -27,9 +27,21 @@ async function startWorkwer() {
         try{
             const submission = await Redis.brPop("posts", 0);
             console.log("This is the worker")
-            const { user, image, latitude, longitude} = JSON.parse(submission!.element)
-            //consider user as email
-            console.log(user)
+            const { email, image, latitude, longitude} = JSON.parse(submission!.element)
+
+            const data = {
+                url: image
+            };
+
+            const response = await fetch('https://image-to-text-server-side.onrender.com/upload/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            console.log(response)
+            console.log(email)
             console.log(image)
             console.log(latitude)
             console.log(longitude)

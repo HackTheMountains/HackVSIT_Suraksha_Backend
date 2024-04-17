@@ -36,11 +36,13 @@ wss.on('connection', function connection(ws) {
             //         client.send(JSON.stringify( data));
             //     }
             // });
-            const { user, image } = JSON.parse(data.toString());
-            if (user !== undefined && image !== undefined) {
-                yield Redis.lPush("posts", JSON.stringify({ user, image }));
-                console.log({ "username": user });
+            const { email, image, latitude, longitude } = JSON.parse(data.toString());
+            if (email !== undefined && image !== undefined) {
+                yield Redis.lPush("posts", JSON.stringify({ email, image, latitude, longitude }));
+                console.log({ "emailId": email });
                 console.log({ "imageURL": image });
+                console.log({ "latitude_server": latitude });
+                console.log({ "longitude_server": longitude });
             }
             else {
                 console.log("Either the image received or user received is NULL");
