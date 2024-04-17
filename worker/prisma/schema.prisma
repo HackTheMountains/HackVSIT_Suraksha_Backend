@@ -15,7 +15,7 @@ model User {
   email     String @unique
   firstname String
   lastname  String
-  MobileNo  String
+  MobileNo  String @unique
   password  String
   posts     Post[]
 }
