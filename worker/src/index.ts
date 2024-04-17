@@ -44,7 +44,7 @@ async function startWorkwer() {
 
 startWorkwer();
 
-app.post('/signIn', async (req, res) => {
+app.post('/signUp', async (req, res) => {
     const { email, firstname, lastname, MobileNo, password } = req.body;
     if (!password) {
         return res.status(400).json({ error: 'Password is required' });
@@ -75,12 +75,13 @@ app.post('/signIn', async (req, res) => {
     }
 });
 
-app.post('/signUp', async (req, res) => {
-    const { email } = req.body;
+app.post('/signIn', async (req, res) => {
+    const { email, password } = req.body;
     try {
         const user = await prisma.user.findUnique({
             where: {
-                email: email
+                email: email,
+                password: password
             }
         });
         if (user) {
