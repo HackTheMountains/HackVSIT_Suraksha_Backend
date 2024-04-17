@@ -1,6 +1,7 @@
 import express from 'express'
 import { createClient } from "redis";
 import { PrismaClient } from '@prisma/client'
+import bodyParser from 'body-parser';
 
 let prisma = new PrismaClient()
 
@@ -15,6 +16,7 @@ Redis.on('error', err => console.log('Redis Client Error', err));
 
 
 const app = express()
+app.use(bodyParser.json());
 const httpServer = app.listen(3000)
 
 async function startWorkwer() {
