@@ -28,23 +28,26 @@ async function startWorkwer() {
             const submission = await Redis.brPop("posts", 0);
             console.log("This is the worker")
             const { email, image, latitude, longitude} = JSON.parse(submission!.element)
-
+            const imageData = JSON.parse(image);
+            const finalURL = imageData.signedUrl;
+            console.log(finalURL)
             const data = {
-                url: image
+                url: finalURL
             };
             console.log(email)
             console.log(image)
             console.log(latitude)
             console.log(longitude)
             console.log("The model will start working now")
-            // const response = await fetch('https://image-to-text-server-side.onrender.com/upload/', {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json'
-            //     },
-            //     body: JSON.stringify(data)
-            // });
-            // console.log(response)
+            const response = await fetch('https://image-to-text-server-side.onrender.com/upload/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            const reponseBody = await response.json();
+            console.log(reponseBody)
         } catch (error) {
             console.error("Error processing submission: ",error);
         }
