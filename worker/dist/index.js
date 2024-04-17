@@ -41,18 +41,19 @@ function startWorkwer() {
                     const data = {
                         url: image
                     };
-                    const response = yield fetch('https://image-to-text-server-side.onrender.com/upload/', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(data)
-                    });
-                    console.log(response);
                     console.log(email);
                     console.log(image);
                     console.log(latitude);
                     console.log(longitude);
+                    console.log("The model will start working now");
+                    // const response = await fetch('https://image-to-text-server-side.onrender.com/upload/', {
+                    //     method: 'POST',
+                    //     headers: {
+                    //         'Content-Type': 'application/json'
+                    //     },
+                    //     body: JSON.stringify(data)
+                    // });
+                    // console.log(response)
                 }
                 catch (error) {
                     console.error("Error processing submission: ", error);
