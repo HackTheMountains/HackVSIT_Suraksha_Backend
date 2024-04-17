@@ -45,7 +45,10 @@ async function startWorkwer() {
 startWorkwer();
 
 app.post('/signIn', async (req, res) => {
-    const { email, firstname, lastname, MobileNo } = req.body;
+    const { email, firstname, lastname, MobileNo, password } = req.body; // Extract password from request body
+    if (!password) {
+        return res.status(400).json({ error: 'Password is required' });
+    }
     try {
         let user = await prisma.user.findUnique({
             where: {
@@ -58,7 +61,8 @@ app.post('/signIn', async (req, res) => {
                     email,
                     firstname,
                     lastname,
-                    MobileNo
+                    MobileNo,
+                    password
                 }
             });
             res.json({ created: true, user });
@@ -70,3 +74,5 @@ app.post('/signIn', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+

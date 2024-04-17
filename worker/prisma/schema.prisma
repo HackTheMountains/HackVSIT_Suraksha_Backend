@@ -16,6 +16,7 @@ model User {
   firstname String
   lastname  String
   MobileNo  String
+  password  String
   posts     Post[]
 }
 
