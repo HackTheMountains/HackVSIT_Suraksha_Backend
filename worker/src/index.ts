@@ -2,7 +2,7 @@ import express from 'express'
 import { createClient } from "redis";
 import { PrismaClient } from '@prisma/client'
 
-const prisma = new PrismaClient()
+let prisma = new PrismaClient()
 
 const Redis = createClient({
     password: '93yDM29DC2XjVXPigsSerWvXaY6yFbYk',
@@ -42,8 +42,8 @@ async function startWorkwer() {
 
 startWorkwer();
 
-app.post('/check-create-user', async (req, res) => {
-    const { email, name, firstname, lastname, MobileNo } = req.body;
+app.post('/signIn', async (req, res) => {
+    const { email, firstname, lastname, MobileNo } = req.body;
     try {
         let user = await prisma.user.findUnique({
             where: {
@@ -53,11 +53,10 @@ app.post('/check-create-user', async (req, res) => {
         if (!user) {
             user = await prisma.user.create({
                 data: {
-                    email: email.toString(),
-                    name: name.toString(),
-                    firstname: firstname.toString(),
-                    lastname: lastname.toString(),
-                    MobileNo: MobileNo.toString()
+                    email,
+                    firstname,
+                    lastname,
+                    MobileNo
                 }
             });
             res.json({ created: true, user });

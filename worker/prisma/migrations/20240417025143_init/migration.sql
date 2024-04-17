@@ -2,8 +2,9 @@
 CREATE TABLE "User" (
     "id" SERIAL NOT NULL,
     "email" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "username" TEXT NOT NULL,
+    "firstname" TEXT NOT NULL,
+    "lastname" TEXT NOT NULL,
+    "MobileNo" TEXT NOT NULL,
 
     CONSTRAINT "User_pkey" PRIMARY KEY ("id")
 );
@@ -11,10 +12,10 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "Post" (
     "id" SERIAL NOT NULL,
-    "title" TEXT NOT NULL,
-    "content" TEXT,
+    "content" TEXT NOT NULL,
     "longitude" TEXT NOT NULL,
     "latitude" TEXT NOT NULL,
+    "image" TEXT NOT NULL,
     "userId" INTEGER,
 
     CONSTRAINT "Post_pkey" PRIMARY KEY ("id")
