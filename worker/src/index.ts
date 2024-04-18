@@ -46,8 +46,9 @@ async function startWorkwer() {
                 },
                 body: JSON.stringify(data)
             });
-            const reponseBody = await response.json();
-            console.log(reponseBody)
+            const responseBody = await response.json();
+            console.log(responseBody.description)
+            console.log(responseBody.sentiment)
         } catch (error) {
             console.error("Error processing submission: ",error);
         }

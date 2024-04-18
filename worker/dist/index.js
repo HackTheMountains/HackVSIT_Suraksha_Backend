@@ -56,8 +56,9 @@ function startWorkwer() {
                         },
                         body: JSON.stringify(data)
                     });
-                    const reponseBody = yield response.json();
-                    console.log(reponseBody);
+                    const responseBody = yield response.json();
+                    console.log(responseBody.description);
+                    console.log(responseBody.sentiment);
                 }
                 catch (error) {
                     console.error("Error processing submission: ", error);
