@@ -1,7 +1,6 @@
 import express from 'express'
 import { WebSocketServer } from 'ws'
 import { createClient } from "redis";
-import cors from 'cors'
 
 const Redis = createClient({
     password: '93yDM29DC2XjVXPigsSerWvXaY6yFbYk',
@@ -16,7 +15,6 @@ Redis.on('error', err => console.log('Redis Client Error', err));
 
 
 const app = express()
-app.use(cors())
 const httpServer = app.listen(4000)
 
 const wss = new WebSocketServer({ server: httpServer });

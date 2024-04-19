@@ -25,7 +25,7 @@ const Redis = (0, redis_1.createClient)({
 startServer();
 Redis.on('error', err => console.log('Redis Client Error', err));
 const app = (0, express_1.default)();
-const httpServer = app.listen(3000);
+const httpServer = app.listen(4000);
 const wss = new ws_1.WebSocketServer({ server: httpServer });
 wss.on('connection', function connection(ws) {
     ws.on('error', console.error);
