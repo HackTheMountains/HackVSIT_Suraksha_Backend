@@ -7,6 +7,6 @@ COPY . .
 RUN npm install
 RUN npx tsc
 
-EXPOSE 3000
+EXPOSE dock00
 
 CMD ["node","dist/index.js"]
