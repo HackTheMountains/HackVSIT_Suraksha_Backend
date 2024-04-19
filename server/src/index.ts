@@ -17,7 +17,7 @@ Redis.on('error', err => console.log('Redis Client Error', err));
 
 const app = express()
 app.use(cors())
-const httpServer = app.listen(3000)
+const httpServer = app.listen(4000)
 
 const wss = new WebSocketServer({ server: httpServer });
 

@@ -51,6 +51,23 @@ async function startWorkwer() {
             const responseBody = await response.json();
             console.log(responseBody.description)
             console.log(responseBody.sentiment)
+            const user = await prisma.user.findUnique({
+                where: {
+                    email: email
+                }
+            });
+            const newPost = await prisma.post.create({
+                    data: {
+                        content: responseBody.description,
+                        longitude: longitude,
+                        latitude: latitude,
+                        image: finalURL,
+                        sentiment: responseBody.sentiment,
+                        censor: "true",
+                        userId: user!.id
+                    }
+                });
+                console.log("New post created:", newPost);
         } catch (error) {
             console.error("Error processing submission: ",error);
         }
