@@ -247,12 +247,31 @@ app.get('/getpostId', (req, res) => __awaiter(void 0, void 0, void 0, function* 
 app.put('/postcensor', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { postId } = req.body;
     try {
+        const post = yield prisma.post.findUnique({
+            where: {
+                id: parseInt(postId)
+            }
+        });
+        if (!post) {
+            return res.status(404).json({ error: 'Post not found' });
+        }
+        let updatedCensor;
+        if (post.censor === "true") {
+            updatedCensor = "false";
+        }
+        else if (post.censor === "false") {
+            updatedCensor = "true";
+        }
+        else {
+            // Handle unexpected censor values
+            return res.status(400).json({ error: 'Invalid censor value' });
+        }
         const updatedPost = yield prisma.post.update({
             where: {
                 id: parseInt(postId)
             },
             data: {
-                censor: "false"
+                censor: updatedCensor
             }
         });
         return res.json({ message: 'Censor value updated successfully', post: updatedPost });
@@ -272,17 +291,21 @@ app.get('/posts', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         return res.status(500).json({ error: 'Internal server error' });
     }
 }));
-// app.post('/admin/login', async (req, res) => {
-//     const { username, password } = req.body;                              awsqz@qzqzqz
-//     try {
-//         const admin = await prisma.admin.findFirst({
-//             where: { username: username, password: password }
-//         });
-//
-//         return res.status(200).json({ message: 'Login successful' });
-//
-//     } catch (error) {
-//         console.error('Error during admin login:', error);
-//         return res.status(500).json({ message: 'Internal server error' });
-//     }
-// });
+app.post('/admin', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { username, password } = req.body;
+    try {
+        const admin = yield prisma.admin.findFirst({
+            where: { username: username, password: password }
+        });
+        if (admin) {
+            return res.status(200).json({ message: "Yes" });
+        }
+        else {
+            return res.status(200).json({ message: "No" });
+        }
+    }
+    catch (error) {
+        console.error('Error during admin login:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+}));

@@ -236,20 +236,38 @@ app.get('/getpostId', async (req, res) => {
 app.put('/postcensor', async (req, res) => {
     const { postId } = req.body;
     try {
+        const post = await prisma.post.findUnique({
+            where: {
+                id: parseInt(postId)
+            }
+        });
+        if (!post) {
+            return res.status(404).json({ error: 'Post not found' });
+        }
+        let updatedCensor;
+        if (post.censor === "true") {
+            updatedCensor = "false";
+        } else if (post.censor === "false") {
+            updatedCensor = "true";
+        } else {
+            return res.status(400).json({ error: 'Invalid censor value' });
+        }
         const updatedPost = await prisma.post.update({
             where: {
                 id: parseInt(postId)
             },
             data: {
-                censor: "false"
+                censor: updatedCensor
             }
         });
+
         return res.json({ message: 'Censor value updated successfully', post: updatedPost });
     } catch (error) {
         console.error('Error updating censor value:', error);
         return res.status(500).json({ error: 'Internal server error' });
     }
 });
+
 app.get('/posts', async (req, res) => {
     try {
         const posts = await prisma.post.findMany();
