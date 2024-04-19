@@ -100,6 +100,7 @@ app.post('/signUp', async (req, res) => {
                     password
                 }
             });
+            console.log()
             res.json({ created: true, user });
         } else {
             res.json({ created: false, user });
@@ -260,6 +261,22 @@ app.get('/posts', async (req, res) => {
     }
 });
 
+app.post('/admin', async (req, res) => {
+    const { username, password } = req.body;
+    try {
+        const admin = await prisma.admin.findFirst({
+            where: { username: username, password: password }
+        });
+        if(admin){
+        return res.status(200).json({ message: "Yes" });
+        } else {
+            return res.status(200).json({message: "No"})
+        }
+    } catch (error) {
+        console.error('Error during admin login:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+});
 
 
 
