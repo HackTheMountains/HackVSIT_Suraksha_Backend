@@ -125,7 +125,7 @@ app.post('/signIn', (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 }));
 app.post('/createPost', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, content, longitude, latitude, image } = req.body;
+    const { email, content, longitude, latitude, image, sentiment } = req.body;
     try {
         const user = yield prisma.user.findUnique({
             where: {
@@ -141,6 +141,7 @@ app.post('/createPost', (req, res) => __awaiter(void 0, void 0, void 0, function
                 longitude,
                 latitude,
                 image,
+                sentiment,
                 userId: user.id
             }
         });

@@ -20,12 +20,20 @@ model User {
   posts     Post[]
 }
 
+model Admin {
+  id       Int    @id @default(autoincrement())
+  username String
+  password String
+}
+
 model Post {
   id        Int    @id @default(autoincrement())
   content   String
   longitude String
   latitude  String
   image     String
+  sentiment Int
+  censor    String
   User      User?  @relation(fields: [userId], references: [id])
   userId    Int?
 }

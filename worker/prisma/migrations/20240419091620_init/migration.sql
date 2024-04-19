@@ -11,12 +11,23 @@ CREATE TABLE "User" (
 );
 
 -- CreateTable
+CREATE TABLE "Admin" (
+    "id" SERIAL NOT NULL,
+    "username" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+
+    CONSTRAINT "Admin_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
 CREATE TABLE "Post" (
     "id" SERIAL NOT NULL,
     "content" TEXT NOT NULL,
     "longitude" TEXT NOT NULL,
     "latitude" TEXT NOT NULL,
     "image" TEXT NOT NULL,
+    "sentiment" INTEGER NOT NULL,
+    "censor" TEXT NOT NULL,
     "userId" INTEGER,
 
     CONSTRAINT "Post_pkey" PRIMARY KEY ("id")

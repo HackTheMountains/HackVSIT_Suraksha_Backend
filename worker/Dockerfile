@@ -1,0 +1,13 @@
+FROM node:21-alpine3.18
+
+WORKDIR /src
+
+COPY . .
+
+RUN npm install
+RUN npx prisma db push
+RUN npx tsc
+
+EXPOSE 3000
+
+CMD ["node","dist/index.js"]

@@ -2,6 +2,7 @@ import express from 'express'
 import { createClient } from "redis";
 import { PrismaClient } from '@prisma/client'
 import bodyParser from 'body-parser';
+import  cors from 'cors';
 
 let prisma = new PrismaClient()
 
@@ -17,6 +18,7 @@ Redis.on('error', err => console.log('Redis Client Error', err));
 
 const app = express()
 app.use(bodyParser.json());
+app.use(cors())
 const httpServer = app.listen(3000)
 
 async function startWorkwer() {
@@ -39,7 +41,7 @@ async function startWorkwer() {
             console.log(latitude)
             console.log(longitude)
             console.log("The model will start working now")
-            const response = await fetch('https://image-to-text-server-side.onrender.com/upload/', {
+            const response = await fetch('http://ec2-13-232-224-92.ap-south-1.compute.amazonaws.com:3000/upload/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -113,7 +115,7 @@ app.post('/signIn', async (req, res) => {
 
 
 app.post('/createPost', async (req, res) => {
-    const { email, content, longitude, latitude, image } = req.body;
+    const { email, content, longitude, latitude, image, sentiment, censor } = req.body;
     try {
         const user = await prisma.user.findUnique({
             where: {
@@ -130,6 +132,8 @@ app.post('/createPost', async (req, res) => {
                 longitude,
                 latitude,
                 image,
+                sentiment,
+                censor,
                 userId: user.id
             }
         });
@@ -141,7 +145,7 @@ app.post('/createPost', async (req, res) => {
 });
 
 app.get('/userPosts', async (req, res) => {
-    const { email } = req.body;
+    const { email, censor } = req.body;
     try {
         const user = await prisma.user.findUnique({
             where: {
@@ -153,7 +157,8 @@ app.get('/userPosts', async (req, res) => {
         }
         const userPosts = await prisma.post.findMany({
             where: {
-                userId: user.id
+                userId: user.id,
+                censor: "true"
             }
         });
         return res.json({ userPosts });
@@ -189,6 +194,44 @@ app.delete('/deletePost', async (req, res) => {
     }
 });
 
+app.get('/getpostId', async (req, res) => {
+    const { postId } = req.body;
+    try {
+        const post = await prisma.post.findUnique({
+            where: {
+                id: parseInt(postId)
+            },
+            include: {
+                User: true
+            }
+        });
+        if (!post) {
+            return res.status(404).json({ error: 'Post not found' });
+        }
+        return res.json({ post });
+    } catch (error) {
+        console.error('Error getting post:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.put('/postcensor', async (req, res) => {
+    const { postId } = req.body;
+    try {
+        const updatedPost = await prisma.post.update({
+            where: {
+                id: parseInt(postId)
+            },
+            data: {
+                censor: "false"
+            }
+        });
+        return res.json({ message: 'Censor value updated successfully', post: updatedPost });
+    } catch (error) {
+        console.error('Error updating censor value:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
 app.get('/posts', async (req, res) => {
     try {
         const posts = await prisma.post.findMany();
