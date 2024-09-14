@@ -16,10 +16,10 @@ const express_1 = __importDefault(require("express"));
 const ws_1 = require("ws");
 const redis_1 = require("redis");
 const Redis = (0, redis_1.createClient)({
-    password: '93yDM29DC2XjVXPigsSerWvXaY6yFbYk',
+    password: 'L07dyz33z8RUKuUBLGcgIxqfY46IAxZs',
     socket: {
-        host: 'redis-15621.c305.ap-south-1-1.ec2.cloud.redislabs.com',
-        port: 15621
+        host: 'redis-15911.c305.ap-south-1-1.ec2.redns.redis-cloud.com',
+        port: 15911
     }
 });
 startServer();

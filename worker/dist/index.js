@@ -19,10 +19,10 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const cors_1 = __importDefault(require("cors"));
 let prisma = new client_1.PrismaClient();
 const Redis = (0, redis_1.createClient)({
-    password: '93yDM29DC2XjVXPigsSerWvXaY6yFbYk',
+    password: 'L07dyz33z8RUKuUBLGcgIxqfY46IAxZs',
     socket: {
-        host: 'redis-15621.c305.ap-south-1-1.ec2.cloud.redislabs.com',
-        port: 15621
+        host: 'redis-15911.c305.ap-south-1-1.ec2.redns.redis-cloud.com',
+        port: 15911
     }
 });
 Redis.on('error', err => console.log('Redis Client Error', err));
@@ -30,66 +30,66 @@ const app = (0, express_1.default)();
 app.use(body_parser_1.default.json());
 app.use((0, cors_1.default)());
 const httpServer = app.listen(3000);
-function startWorkwer() {
+function startWorker() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
+            // Connect to Redis
             yield Redis.connect();
             console.log("Worker connected to Redis");
+            // Start infinite loop to process Redis queue
             while (true) {
                 try {
+                    // Wait for a new post in the Redis 'posts' queue
                     const submission = yield Redis.brPop("posts", 0);
-                    console.log("This is the worker");
+                    console.log("Processing a new post from Redis queue");
+                    // Parse the data from the submission
                     const { email, image, latitude, longitude } = JSON.parse(submission.element);
                     const imageData = JSON.parse(image);
                     const finalURL = imageData.signedUrl;
-                    console.log(finalURL);
-                    const data = {
-                        url: finalURL
-                    };
-                    console.log(email);
-                    console.log(image);
-                    console.log(latitude);
-                    console.log(longitude);
-                    console.log("The model will start working now");
-                    const response = yield fetch('http://ec2-13-232-224-92.ap-south-1.compute.amazonaws.com:3000/upload/', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify(data)
-                    });
-                    const responseBody = yield response.json();
-                    console.log(responseBody.description);
-                    console.log(responseBody.sentiment);
+                    console.log(`Processing submission from user: ${email}`);
+                    console.log(`Image URL: ${finalURL}, Latitude: ${latitude}, Longitude: ${longitude}`);
+                    // Send data to external model for processing (this is the commented out part in your code)
+                    const data = { url: finalURL };
+                    // Uncomment when ready to fetch response from external service
+                    // const response = await fetch('http://ec2-13-232-224-92.ap-south-1.compute.amazonaws.com:3000/upload/', {
+                    //     method: 'POST',
+                    //     headers: { 'Content-Type': 'application/json' },
+                    //     body: JSON.stringify(data)
+                    // });
+                    const response = { description: "This is a test description", sentiment: "positive" };
+                    // const responseBody = await response.json();
+                    const responseBody = response; // Mocked response for now
+                    console.log(`Model response: Description: ${responseBody.description}, Sentiment: ${responseBody.sentiment}`);
                     const user = yield prisma.user.findUnique({
-                        where: {
-                            email: email
-                        }
+                        where: { email }
                     });
+                    if (!user) {
+                        console.error("User not found for email:", email);
+                        continue;
+                    }
                     const newPost = yield prisma.post.create({
                         data: {
-                            content: responseBody.description,
-                            longitude: longitude,
-                            latitude: latitude,
+                            content: "This is the description",
+                            longitude,
+                            latitude,
                             image: finalURL,
-                            sentiment: responseBody.sentiment,
-                            censor: "true",
+                            sentiment: "This is sentiment",
                             userId: user.id
                         }
                     });
-                    console.log("New post created:", newPost);
+                    console.log("New post created successfully:", newPost);
                 }
                 catch (error) {
-                    console.error("Error processing submission: ", error);
+                    console.error("Error processing submission:", error);
                 }
             }
         }
         catch (error) {
-            console.error("Failed to connect to Redis", error);
+            console.error("Failed to connect to Redis:", error);
         }
     });
 }
-startWorkwer();
+startWorker();
 app.post('/signUp', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, firstname, lastname, MobileNo, password } = req.body;
     if (!password) {
@@ -162,7 +162,6 @@ app.post('/createPost', (req, res) => __awaiter(void 0, void 0, void 0, function
                 latitude,
                 image,
                 sentiment,
-                censor,
                 userId: user.id
             }
         });
@@ -174,7 +173,7 @@ app.post('/createPost', (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 }));
 app.get('/userPosts', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { email, censor } = req.body;
+    const { email } = req.body;
     try {
         const user = yield prisma.user.findUnique({
             where: {
@@ -187,7 +186,10 @@ app.get('/userPosts', (req, res) => __awaiter(void 0, void 0, void 0, function* 
         const userPosts = yield prisma.post.findMany({
             where: {
                 userId: user.id,
-                censor: "true"
+                censor: false
+            },
+            include: {
+                statuses: true
             }
         });
         return res.json({ userPosts });
@@ -204,19 +206,15 @@ app.delete('/deletePost', (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
     try {
         const post = yield prisma.post.findUnique({
-            where: {
-                id: parseInt(postId)
-            }
+            where: { id: parseInt(postId) }
         });
         if (!post) {
             return res.status(404).json({ error: 'Post not found' });
         }
         yield prisma.post.delete({
-            where: {
-                id: parseInt(postId)
-            }
+            where: { id: parseInt(postId) }
         });
-        return res.json({ message: 'Post deleted successfully' });
+        return res.json({ message: 'Post and its statuses deleted successfully' });
     }
     catch (error) {
         console.error('Error deleting post:', error);
@@ -255,17 +253,7 @@ app.put('/postcensor', (req, res) => __awaiter(void 0, void 0, void 0, function*
         if (!post) {
             return res.status(404).json({ error: 'Post not found' });
         }
-        let updatedCensor;
-        if (post.censor === "true") {
-            updatedCensor = "false";
-        }
-        else if (post.censor === "false") {
-            updatedCensor = "true";
-        }
-        else {
-            // Handle unexpected censor values
-            return res.status(400).json({ error: 'Invalid censor value' });
-        }
+        const updatedCensor = !post.censor;
         const updatedPost = yield prisma.post.update({
             where: {
                 id: parseInt(postId)
@@ -283,7 +271,11 @@ app.put('/postcensor', (req, res) => __awaiter(void 0, void 0, void 0, function*
 }));
 app.get('/posts', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const posts = yield prisma.post.findMany();
+        const posts = yield prisma.post.findMany({
+            include: {
+                statuses: true,
+            }
+        });
         return res.json({ posts });
     }
     catch (error) {
@@ -307,5 +299,65 @@ app.post('/admin', (req, res) => __awaiter(void 0, void 0, void 0, function* () 
     catch (error) {
         console.error('Error during admin login:', error);
         return res.status(500).json({ message: 'Internal server error' });
+    }
+}));
+app.get('/totalPosts', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const totalPosts = yield prisma.post.count();
+        return res.json({ totalPosts });
+    }
+    catch (error) {
+        console.error('Error getting total number of posts:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+}));
+app.post('/userTotalPosts', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email } = req.body;
+    if (!email) {
+        return res.status(400).json({ error: 'Email is required' });
+    }
+    try {
+        const user = yield prisma.user.findUnique({
+            where: { email: email.toString() }
+        });
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+        const totalPosts = yield prisma.post.count({
+            where: { userId: user.id }
+        });
+        return res.json({ totalPosts });
+    }
+    catch (error) {
+        console.error('Error getting total number of user posts:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+}));
+app.put('/toggleCompleted', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { postId } = req.body;
+    if (!postId) {
+        return res.status(400).json({ error: 'Post ID is required' });
+    }
+    try {
+        const post = yield prisma.post.findUnique({
+            where: { id: parseInt(postId) }
+        });
+        if (!post) {
+            return res.status(404).json({ error: 'Post not found' });
+        }
+        const updatedPost = yield prisma.post.update({
+            where: { id: parseInt(postId) },
+            data: {
+                completed: !post.completed
+            }
+        });
+        return res.json({
+            message: 'Completed status toggled successfully',
+            post: updatedPost
+        });
+    }
+    catch (error) {
+        console.error('Error toggling completed status:', error);
+        return res.status(500).json({ error: 'Internal server error' });
     }
 }));

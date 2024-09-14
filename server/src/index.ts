@@ -3,10 +3,10 @@ import { WebSocketServer } from 'ws'
 import { createClient } from "redis";
 
 const Redis = createClient({
-    password: '93yDM29DC2XjVXPigsSerWvXaY6yFbYk',
+    password: 'L07dyz33z8RUKuUBLGcgIxqfY46IAxZs',
     socket: {
-        host: 'redis-15621.c305.ap-south-1-1.ec2.cloud.redislabs.com',
-        port: 15621
+        host: 'redis-15911.c305.ap-south-1-1.ec2.redns.redis-cloud.com',
+        port: 15911
     }
 });
 
@@ -23,11 +23,6 @@ wss.on('connection', function connection(ws) {
     ws.on('error', console.error);
 
     ws.on('message', async function message(data) {
-        // wss.clients.forEach(function each(client) {
-        //     if (client.readyState === WebSocket.OPEN) {
-        //         client.send(JSON.stringify( data));
-        //     }
-        // });
         const { email, image, latitude, longitude} = JSON.parse(data.toString())
         if(email!==undefined && image!==undefined){
         await Redis.lPush("posts", JSON.stringify({email,image,latitude,longitude}))

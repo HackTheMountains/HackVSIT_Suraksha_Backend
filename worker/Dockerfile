@@ -5,7 +5,7 @@ WORKDIR /src
 COPY . .
 
 RUN npm install
-RUN npx prisma db push
+RUN npx prisma generate
 RUN npx tsc
 
 EXPOSE 3000
