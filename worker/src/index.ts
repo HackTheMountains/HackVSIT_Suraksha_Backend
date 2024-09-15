@@ -446,3 +446,20 @@ app.post('/createStatus', async (req, res) => {
         return res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+app.get('/uncensoredPosts', async (req, res) => {
+    try {
+        const posts = await prisma.post.findMany({
+            where: {
+                censor: false
+            },
+            include: {
+                statuses: true,
+            }
+        });
+        return res.json({ posts });
+    } catch (error) {
+        console.error('Error fetching uncensored posts:', error);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
